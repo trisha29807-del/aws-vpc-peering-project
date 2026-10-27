@@ -3,43 +3,136 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#180e1e">
 <title>AWS VPC Peering | Trisha</title>
-<meta name="description" content="AWS VPC Peering lab: private communication between two VPCs, route tables, security groups, bastion-host SSH, connectivity tests, and cleanup evidence.">
+<meta name="description" content="A visual walkthrough of Trisha's AWS VPC Peering lab: network architecture, private EC2 connectivity, SSH validation, security-group testing, and cleanup evidence.">
 <style>
-:root{color-scheme:dark;--bg:#10131b;--panel:#191e2a;--text:#f4f5f7;--muted:#b7bdcb;--accent:#9bb8ff;--line:#30384a}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 10% 0%,#263452 0,transparent 38%),var(--bg);color:var(--text);font:16px/1.65 system-ui,-apple-system,Segoe UI,sans-serif}
-main{max-width:1000px;margin:auto;padding:56px 22px 72px}.eyebrow{color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:.78rem}
-h1{font-size:clamp(2.4rem,6vw,4.5rem);line-height:1.06;letter-spacing:-.04em;margin:.6rem 0 1rem}h2{font-size:1.35rem;margin:0 0 12px}p{color:var(--muted)}.lead{font-size:1.15rem;max-width:740px}
-.pills{display:flex;gap:9px;flex-wrap:wrap;margin:24px 0 38px}.pill{border:1px solid var(--line);border-radius:999px;padding:6px 12px;color:var(--muted);font-size:.88rem}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:24px 0}.card{background:rgba(25,30,42,.9);border:1px solid var(--line);border-radius:18px;padding:22px}.cidr{font:600 .95rem ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--accent)}ul{padding-left:20px;color:var(--muted)}li{margin:.35rem 0}.links{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}.btn{display:inline-block;text-decoration:none;color:#10131b;background:var(--accent);padding:11px 16px;border-radius:10px;font-weight:700}.btn.secondary{background:transparent;border:1px solid var(--line);color:var(--text)}a{color:var(--accent)}.note{border-left:3px solid var(--accent);padding:8px 0 8px 16px;margin:20px 0;color:var(--muted)}footer{border-top:1px solid var(--line);margin-top:44px;padding-top:18px;color:var(--muted);font-size:.9rem}
+:root{color-scheme:dark;--bg:#100b16;--sidebar:#180f20;--panel:#211528;--panel2:#29182f;--text:#f8f1fa;--muted:#c6b8ce;--line:#49304f;--pink:#f078c6;--purple:#b18aff;--green:#57dfa0;--blue:#82b5ff;--shadow:0 18px 50px #05030845}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;background:radial-gradient(ellipse at 68% -10%,#51214d66,transparent 40%),var(--bg);color:var(--text);font:15px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:inherit}button{font:inherit}.layout{min-height:100vh}.sidebar{position:fixed;inset:0 auto 0 0;width:228px;background:linear-gradient(180deg,#211126f5,#140d1cf7);border-right:1px solid var(--line);padding:26px 16px;display:flex;flex-direction:column;z-index:5}.brand{display:flex;align-items:center;gap:12px;padding:0 8px 28px}.crest{width:42px;height:42px;border:1px solid #bd8cbe;border-radius:13px;display:grid;place-items:center;color:var(--pink);font-size:22px}.brand strong{display:block;font-size:1.18rem;font-style:italic;letter-spacing:.03em}.brand small{color:var(--muted)}.nav{display:grid;gap:7px}.nav a{display:flex;align-items:center;gap:12px;text-decoration:none;padding:11px 12px;border-radius:10px;color:var(--muted);transition:.2s}.nav a:hover,.nav a.active{background:#6b315a55;color:white}.nav a.active{box-shadow:inset 3px 0 var(--pink)}.nav .ico{width:22px;text-align:center;font-size:18px}.sidequote{margin:auto 10px 16px;color:#e9a0d6;font-family:Georgia,serif;font-style:italic;font-size:1.12rem;line-height:1.5}.sidequote span{display:block;color:var(--pink);font-size:1.4rem}.sidefoot{border-top:1px solid var(--line);padding:15px 8px 0;color:var(--muted);font-size:.78rem}.main{margin-left:228px;min-width:0}.hero{position:relative;overflow:hidden;padding:45px clamp(22px,4vw,58px) 32px;border-bottom:1px solid var(--line);background:linear-gradient(115deg,#29152fbd,#140d1b66 70%)}.hero:before,.hero:after{content:"";position:absolute;pointer-events:none;border:1px solid #c75baf22;border-radius:50%;width:680px;height:250px;right:-130px;top:-180px;transform:rotate(-18deg)}.hero:after{width:780px;height:300px;right:-180px;top:-205px}.hero-content{position:relative;z-index:1;max-width:980px}.topline{display:flex;justify-content:space-between;align-items:center;gap:16px}.eyebrow{display:inline-flex;align-items:center;gap:8px;border:1px solid #7c426e;border-radius:999px;padding:5px 12px;background:#3a1b3b88;font-size:.82rem;color:#f3c9e8}.theme-toggle{border:1px solid var(--line);border-radius:999px;background:#291a30;color:var(--text);padding:8px 12px;cursor:pointer}.hero h1{font-size:clamp(2.5rem,5vw,4.5rem);line-height:1.02;letter-spacing:-.045em;margin:18px 0 10px}.hero h1 span{color:var(--pink)}.subtitle{font-size:1.15rem;font-weight:650;margin:0;color:#f4e7f7}.intro{max-width:720px;color:var(--muted);font-size:1rem;margin:14px 0 20px}.pills{display:flex;flex-wrap:wrap;gap:8px}.pill{padding:5px 11px;border-radius:999px;background:#292442;border:1px solid #3e3458;color:#eee9ff;font-size:.8rem}.cloud-art{position:absolute;right:4%;top:40px;width:240px;opacity:.95;pointer-events:none}.content{padding:22px clamp(18px,3vw,44px) 40px;max-width:1500px;margin:auto}.section-title{display:flex;align-items:center;gap:10px;font-size:1.2rem;margin:0 0 16px}.section-title .icon{font-size:1.3rem;color:var(--pink)}.top-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,.9fr);gap:18px}.card{background:linear-gradient(145deg,#28192fef,#1b1324f7);border:1px solid var(--line);border-radius:15px;padding:20px;box-shadow:var(--shadow);min-width:0}.arch-card{overflow:hidden}.architecture{display:grid;grid-template-columns:minmax(0,1fr) 78px minmax(0,1fr);align-items:center;gap:10px}.vpc{border:1px solid var(--blue);border-radius:13px;padding:12px;background:#14233caa;min-width:0}.vpc.b{border-color:var(--green);background:#102d27aa}.vpc-head{display:flex;align-items:center;gap:8px;font-weight:750;margin-bottom:12px}.vpc-symbol{width:30px;height:30px;border-radius:8px;background:#3867b5;display:grid;place-items:center}.vpc.b .vpc-symbol{background:#258765}.cidr{font:600 .8rem ui-monospace,SFMono-Regular,Consolas,monospace;color:#c8dcff;overflow-wrap:anywhere}.vpc.b .cidr{color:#b3f5d9}.subnet{border:1px dashed #7ba8e6;border-radius:9px;padding:10px;margin-top:10px}.vpc.b .subnet{border-color:#63d6a4}.subnet small{display:block;color:var(--muted);font-size:.75rem;margin-bottom:8px}.node{display:flex;align-items:center;gap:8px;background:#ffffff0b;border:1px solid #ffffff13;border-radius:7px;padding:7px;margin-top:7px;font-size:.78rem}.node-icon{width:25px;height:25px;display:grid;place-items:center;border-radius:6px;background:#d97725;color:white;flex-shrink:0}.peering{text-align:center;color:var(--purple);font-size:.76rem;line-height:1.3}.peering .line{font-size:2rem;line-height:1.3;white-space:nowrap}.peering b{display:block;color:#e6d7ff}.facts{display:grid;gap:13px}.fact{display:flex;gap:11px;align-items:flex-start}.check{flex-shrink:0;width:23px;height:23px;display:grid;place-items:center;border-radius:50%;background:#ed9ad4;color:#32152e;font-weight:900;font-size:.8rem}.fact strong{display:block;font-size:.91rem;font-weight:650}.fact small{display:block;color:var(--muted);font-size:.82rem;margin-top:1px}.lower-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-top:18px}.test-list{display:grid;gap:0}.test{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #ffffff10;font-size:.86rem}.test:last-child{border:0}.status{display:inline-flex;align-items:center;gap:5px;color:var(--green);font-weight:700;font-size:.78rem;white-space:nowrap}.status:before{content:"✓";display:grid;place-items:center;background:#1d644b;color:#b6ffdb;border-radius:50%;width:19px;height:19px}.muted-note{font-size:.8rem;color:var(--muted);border-left:3px solid var(--purple);padding-left:11px;margin:14px 0 0}.quicklinks{display:grid;gap:8px}.quicklinks a{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 11px;border:1px solid #674061;border-radius:9px;background:#391f3c88;text-decoration:none;font-size:.84rem;transition:.2s}.quicklinks a:hover{border-color:var(--pink);transform:translateY(-1px)}.quicklinks .arrow{color:var(--pink)}.about-list{display:grid;grid-template-columns:90px 1fr;gap:8px;font-size:.86rem}.about-list dt{color:var(--muted)}.about-list dd{margin:0;overflow-wrap:anywhere}.evidence-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.evidence{display:block;text-decoration:none;padding:14px;border:1px solid var(--line);border-radius:11px;background:#ffffff05;transition:.2s}.evidence:hover{border-color:var(--pink);background:#ed78c610}.evidence .ev-icon{font-size:1.3rem}.evidence strong{display:block;margin:5px 0 2px;font-size:.88rem}.evidence small{color:var(--muted)}.section{margin-top:25px}.footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding:20px clamp(18px,3vw,44px);color:var(--muted);font-size:.82rem}.footer a{color:var(--pink);text-decoration:none}.notice{padding:12px 14px;border-radius:10px;background:#3d2a20;border:1px solid #72503a;color:#f6d5b4;font-size:.84rem;margin-top:13px}.light{color-scheme:light;--bg:#f7f0f7;--sidebar:#fff8ff;--panel:#fff;--panel2:#f4e9f5;--text:#28152c;--muted:#6d5a70;--line:#e3cfe3;--shadow:0 12px 35px #41234310}.light .hero{background:linear-gradient(115deg,#f0d9ef,#fff8ff)}.light .card{background:linear-gradient(145deg,#fff,#fbf2fb)}.light .pill{background:#f1e7fa;color:#513b65;border-color:#e0d2ed}.light .vpc{background:#eaf2ff}.light .vpc.b{background:#e6f8ef}.light .node{background:#ffffffa8;border-color:#dce0e8}.light .quicklinks a{background:#fff1fb}.light .theme-toggle{background:white;color:var(--text)}.light .subnet small{color:#62556a}
+@media(max-width:1100px){.cloud-art{width:170px;right:3%;top:60px;opacity:.55}.top-grid{grid-template-columns:1fr}.lower-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.lower-grid .about-card{grid-column:span 2}}
+@media(max-width:760px){.sidebar{position:static;width:auto;height:auto;padding:14px 16px;border-right:0;border-bottom:1px solid var(--line)}.brand{padding:0 4px 12px}.nav{display:flex;overflow-x:auto;gap:5px;padding-bottom:2px}.nav a{white-space:nowrap;padding:8px 10px;font-size:.82rem}.nav .ico{width:auto}.sidequote,.sidefoot{display:none}.main{margin:0}.hero{padding:26px 20px}.cloud-art{width:110px;top:55px;right:12px;opacity:.3}.hero h1{font-size:2.65rem}.intro{font-size:.94rem}.content{padding:18px 14px 30px}.card{padding:16px}.architecture{grid-template-columns:1fr;gap:8px}.peering{order:2}.peering .line{transform:rotate(90deg);height:32px}.vpc.b{order:3}.lower-grid{grid-template-columns:1fr}.lower-grid .about-card{grid-column:auto}.evidence-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.topline{align-items:flex-start}.theme-toggle{font-size:.78rem;padding:7px 9px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important}}
 </style>
 </head>
-<body><main>
-<div class="eyebrow">Cloud Networking · AWS Lab</div>
-<h1>AWS VPC<br>Peering Project</h1>
-<p class="lead">A hands-on implementation of private communication between two Amazon Virtual Private Clouds, using route tables, security groups, private EC2 instances, and bastion-host SSH access.</p>
-<div class="pills"><span class="pill">Amazon VPC</span><span class="pill">VPC Peering</span><span class="pill">EC2</span><span class="pill">SSH ProxyJump</span><span class="pill">ICMP Testing</span></div>
-<section>
-<h2>Network architecture</h2>
-<div class="grid">
-<div class="card"><h2>VPC A</h2><div class="cidr">10.10.0.0/16</div><ul><li>Public subnet: 10.10.1.0/24</li><li>Bastion: 10.10.1.10</li><li>Private subnet: 10.10.2.0/24</li><li>Application A: 10.10.2.10</li></ul></div>
-<div class="card"><h2>VPC Peering</h2><p>During testing, a peering connection provided a private route between the two non-overlapping VPC address ranges. Both route tables and security-group rules had to permit the traffic.</p><div class="cidr">Private IPv4 connectivity</div></div>
-<div class="card"><h2>VPC B</h2><div class="cidr">10.20.0.0/16</div><ul><li>Private subnet: 10.20.1.0/24</li><li>Application B: 10.20.1.10</li></ul></div>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <div class="brand"><div class="crest">♧</div><div><strong>Trisha</strong><small>IGDTUW | CSE</small></div></div>
+  <nav class="nav" aria-label="Main navigation">
+    <a class="active" href="#home"><span class="ico">⌂</span>Home</a>
+    <a href="#architecture"><span class="ico">☁</span>Architecture</a>
+    <a href="#tests"><span class="ico">⌁</span>Connectivity Tests</a>
+    <a href="#evidence"><span class="ico">▧</span>Evidence</a>
+    <a href="#report"><span class="ico">▤</span>Report</a>
+    <a href="#cleanup"><span class="ico">♲</span>Cleanup</a>
+    <a href="#about"><span class="ico">♙</span>About</a>
+  </nav>
+  <div class="sidequote">“Build<br>Learn<br>Grow”<span>♡</span></div>
+  <div class="sidefoot">AWS Cloud Networking Lab<br>Internship Batch 1</div>
+</aside>
+<div class="main">
+<header class="hero" id="home">
+  <svg class="cloud-art" viewBox="0 0 260 160" aria-hidden="true"><defs><linearGradient id="cg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f078c6"/><stop offset="1" stop-color="#9d70ff"/></linearGradient></defs><path d="M47 111C20 111 15 74 42 63C45 32 82 21 103 43C120 7 175 13 183 51C215 46 239 69 231 94C225 111 209 115 194 115H47Z" fill="#29182f" stroke="url(#cg)" stroke-width="2.5"/><text x="130" y="85" fill="#fff" font-size="25" font-weight="700" text-anchor="middle">aws</text><path d="M104 94Q133 109 163 94" stroke="#ff9f44" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+  <div class="hero-content">
+    <div class="topline"><span class="eyebrow">☁ &nbsp; AWS Cloud Project</span><button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle light and dark theme">☼ &nbsp; Toggle theme</button></div>
+    <h1>VPC Peering<br><span>Project</span></h1>
+    <p class="subtitle">Connecting Two VPCs | Enabling Secure Communication</p>
+    <p class="intro">A hands-on AWS networking lab demonstrating private communication between two Virtual Private Clouds using VPC Peering, route tables, security groups, private EC2 instances, and bastion-host SSH access.</p>
+    <div class="pills"><span class="pill">Amazon VPC</span><span class="pill">VPC Peering</span><span class="pill">EC2</span><span class="pill">SSH ProxyJump</span><span class="pill">ICMP</span></div>
+  </div>
+</header>
+<main class="content">
+  <div class="top-grid">
+    <section class="card arch-card" id="architecture">
+      <h2 class="section-title"><span class="icon">☁</span> VPC Architecture</h2>
+      <div class="architecture" role="img" aria-label="VPC A with public bastion and private App A connected by VPC peering to VPC B with private App B">
+        <div class="vpc">
+          <div class="vpc-head"><span class="vpc-symbol">☁</span><div><div>VPC A</div><div class="cidr">10.10.0.0/16</div></div></div>
+          <div class="subnet"><small>Public subnet · 10.10.1.0/24</small><div class="node"><span class="node-icon">▣</span><span>Bastion host<br><span class="cidr">10.10.1.10</span></span></div></div>
+          <div class="subnet"><small>Private subnet · 10.10.2.0/24</small><div class="node"><span class="node-icon">▣</span><span>Application A<br><span class="cidr">10.10.2.10</span></span></div></div>
+        </div>
+        <div class="peering"><div class="line">⟷</div><b>VPC Peering</b><span>Private routes</span></div>
+        <div class="vpc b">
+          <div class="vpc-head"><span class="vpc-symbol">☁</span><div><div>VPC B</div><div class="cidr">10.20.0.0/16</div></div></div>
+          <div class="subnet"><small>Private subnet · 10.20.1.0/24</small><div class="node"><span class="node-icon">▣</span><span>Application B<br><span class="cidr">10.20.1.10</span></span></div></div>
+          <p style="font-size:.76rem;color:var(--muted);margin:10px 2px 0">Private workload; no public subnet shown.</p>
+        </div>
+      </div>
+    </section>
+    <section class="card">
+      <h2 class="section-title"><span class="icon">✦</span> Project Highlights</h2>
+      <div class="facts">
+        <div class="fact"><span class="check">✓</span><div><strong>Two non-overlapping VPCs</strong><small>10.10.0.0/16 and 10.20.0.0/16</small></div></div>
+        <div class="fact"><span class="check">✓</span><div><strong>Routes and security groups</strong><small>Configured for cross-VPC traffic</small></div></div>
+        <div class="fact"><span class="check">✓</span><div><strong>VPC peering established</strong><small>Private communication between networks</small></div></div>
+        <div class="fact"><span class="check">✓</span><div><strong>Bastion-host SSH access</strong><small>Reached both private EC2 instances</small></div></div>
+        <div class="fact"><span class="check">✓</span><div><strong>Failure and recovery tested</strong><small>ICMP rule removed, then restored</small></div></div>
+        <div class="fact"><span class="check">✓</span><div><strong>Lab resources cleaned up</strong><small>Cleanup screenshots included below</small></div></div>
+      </div>
+    </section>
+  </div>
+  <div class="lower-grid">
+    <section class="card" id="tests">
+      <h2 class="section-title"><span class="icon">⌁</span> Connectivity Tests</h2>
+      <div class="test-list">
+        <div class="test"><span>SSH to private App A via bastion</span><span class="status">Passed</span></div>
+        <div class="test"><span>SSH to private App B via bastion</span><span class="status">Passed</span></div>
+        <div class="test"><span>Ping App A → App B</span><span class="status">4/4</span></div>
+        <div class="test"><span>Ping App B → App A</span><span class="status">4/4</span></div>
+        <div class="test"><span>Remove ICMP rule</span><span class="status" style="color:#ffbd86">Blocked</span></div>
+        <div class="test"><span>Restore ICMP rule</span><span class="status">Recovered</span></div>
+      </div>
+      <p class="muted-note">Both ping directions had 0% packet loss. A pre-peering baseline failure was not captured, so it is not claimed as a completed test.</p>
+    </section>
+    <section class="card" id="report">
+      <h2 class="section-title"><span class="icon">↗</span> Quick Links</h2>
+      <div class="quicklinks">
+        <a href="docs/Trisha%20EWB%20VPC%20Peering%20Project%20(AWS%20Batch%201).pdf"><span>▤ &nbsp; Open project report (PDF)</span><span class="arrow">→</span></a>
+        <a href="screenshots/AWS_VPC_Peering_Evidence/"><span>▧ &nbsp; Browse all evidence</span><span class="arrow">→</span></a>
+        <a href="screenshots/AWS_VPC_Peering_Evidence/06_Cleanup/"><span>♲ &nbsp; Cleanup evidence (27)</span><span class="arrow">→</span></a>
+        <a href="https://github.com/trisha29807-del/aws-vpc-peering-project"><span>⌘ &nbsp; View GitHub repository</span><span class="arrow">→</span></a>
+      </div>
+      <p class="muted-note">Links point to the files and folders currently present in this repository.</p>
+    </section>
+    <section class="card about-card" id="about">
+      <h2 class="section-title"><span class="icon">♙</span> About the Project</h2>
+      <dl class="about-list">
+        <dt>Author</dt><dd>Trisha</dd>
+        <dt>Branch</dt><dd>CSE · IGDTUW</dd>
+        <dt>Platform</dt><dd>Amazon Web Services</dd>
+        <dt>Region</dt><dd>Asia Pacific (Sydney)</dd>
+        <dt>Region code</dt><dd><code>ap-southeast-2</code></dd>
+        <dt>Repository</dt><dd><a href="https://github.com/trisha29807-del/aws-vpc-peering-project">aws-vpc-peering-project ↗</a></dd>
+      </dl>
+    </section>
+  </div>
+  <section class="section card" id="evidence">
+    <h2 class="section-title"><span class="icon">▧</span> Evidence Library</h2>
+    <p style="color:var(--muted);margin-top:-5px">Browse the real screenshot folders already uploaded to the repository.</p>
+    <div class="evidence-grid">
+      <a class="evidence" href="screenshots/AWS_VPC_Peering_Evidence/01_Ping_Tests/"><span class="ev-icon">⌁</span><strong>01 · Ping tests</strong><small>Connectivity results</small></a>
+      <a class="evidence" href="screenshots/AWS_VPC_Peering_Evidence/02_SSH_Access/"><span class="ev-icon">⌘</span><strong>02 · SSH access</strong><small>Bastion and private hosts</small></a>
+      <a class="evidence" href="screenshots/AWS_VPC_Peering_Evidence/03_VPC_Peering_and_Routes/"><span class="ev-icon">☁</span><strong>03 · Peering & routes</strong><small>Network configuration</small></a>
+      <a class="evidence" href="screenshots/AWS_VPC_Peering_Evidence/04_Security_Groups/"><span class="ev-icon">♙</span><strong>04 · Security groups</strong><small>Traffic permissions</small></a>
+      <a class="evidence" href="screenshots/AWS_VPC_Peering_Evidence/05_EC2_Private_IPs/"><span class="ev-icon">▣</span><strong>05 · EC2 private IPs</strong><small>Instance addressing</small></a>
+      <a class="evidence" href="screenshots/AWS_VPC_Peering_Evidence/06_Cleanup/"><span class="ev-icon">♲</span><strong>06 · Cleanup</strong><small>27 cleanup screenshots</small></a>
+    </div>
+  </section>
+  <section class="section card" id="cleanup">
+    <h2 class="section-title"><span class="icon">♲</span> Cleanup & Security</h2>
+    <p style="color:var(--muted);margin:0">The evidence records termination of the lab instances and removal of the lab networking resources. The final VPC screenshot shows the two lab VPCs absent while one unrelated VPC remains. AWS billing data can lag, so check the Billing console separately.</p>
+    <div class="notice">Security note: never upload private keys, passwords, access keys, tokens, or other credentials to a public repository.</div>
+  </section>
+</main>
+<footer class="footer"><span>AWS VPC Peering Project &nbsp; | &nbsp; Trisha &nbsp; | &nbsp; IGDTUW CSE</span><span><a href="https://github.com/trisha29807-del">GitHub profile</a> &nbsp; · &nbsp; Built as an AWS learning project ♡</span></footer>
 </div>
-</section>
-<section class="card">
-<h2>Validation results</h2>
-<ul><li>SSH access to both private instances through the bastion host succeeded.</li><li>App A → App B ping: 4/4 packets received, 0% loss.</li><li>App B → App A ping: 4/4 packets received, 0% loss.</li><li>A controlled ICMP security-group change blocked ping; restoring the rule restored connectivity.</li></ul>
-<p class="note">A pre-peering baseline failure was not captured; this limitation is documented in the report.</p>
-</section>
-<section style="margin-top:30px">
-<h2>Project deliverables</h2>
-<p>The report and evidence links will work after the corresponding files are uploaded to this repository.</p>
-<div class="links"><a class="btn" href="docs/Trisha_EWB_VPC_Peering_Final.pdf">Read the PDF report</a><a class="btn secondary" href="docs/Trisha_EWB_VPC_Peering_Updated.docx">Download editable report</a><a class="btn secondary" href="https://github.com/trisha29807-del/aws-vpc-peering-project">View GitHub repository</a></div>
-</section>
-<section style="margin-top:30px">
-<h2>Cleanup and security</h2>
-<p>The lab instances and lab network resources were removed after testing. The final VPC console evidence shows both lab VPCs absent while one other VPC remains. Credentials and private keys must never be committed to a public repository. Billing data can lag, so account billing should be checked separately.</p>
-</section>
-<footer>Created by Trisha · AWS Internship Batch 1 · Region used: Asia Pacific (Sydney), ap-southeast-2</footer>
-</main></body></html>
+</div>
+<script>
+const toggle=document.getElementById('themeToggle');
+toggle.addEventListener('click',()=>{document.body.classList.toggle('light');toggle.textContent=document.body.classList.contains('light')?'☾  Switch to dark':'☼  Switch to light';});
+const links=[...document.querySelectorAll('.nav a')];
+const sections=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+entry.target.id));}})},{rootMargin:'-20% 0px -65% 0px'});sections.forEach(section=>observer.observe(section));}
+</script>
+</body>
+</html>
