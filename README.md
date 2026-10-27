@@ -43,7 +43,6 @@ The two VPCs use non-overlapping CIDR ranges. During the lab, VPC Peering and ro
 - **[Implementation and cleanup screenshots](screenshots/AWS_VPC_Peering_Evidence/)** — organized evidence folders.
 - **[Project landing page source](index.html)** — source code for the live GitHub Pages website.
 
-The editable DOCX and the separately named final PDF are **not currently in this repository**.
 
 ## Evidence index
 
