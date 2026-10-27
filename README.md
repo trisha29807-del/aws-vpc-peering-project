@@ -39,7 +39,7 @@ The two VPCs use non-overlapping CIDR ranges. During the lab, VPC Peering and ro
 
 ## Repository contents
 
-- **[Project report (PDF)](docs/Trisha%20EWB%20VPC%20Peering%20Project%20(AWS%20Batch%201).pdf)** — the PDF currently present in the repository.
+- **[Final project report (PDF)](docs/Trisha%20EWB%20VPC%20Peering%20Project%20(AWS%20Batch%201).pdf)** — finalized project report.
 - **[Implementation and cleanup screenshots](screenshots/AWS_VPC_Peering_Evidence/)** — organized evidence folders.
 - **[Project landing page source](index.html)** — source code for the live GitHub Pages website.
 
@@ -55,7 +55,6 @@ The evidence directory currently contains 44 PNG screenshots, grouped as follows
 - [05 — EC2 private IPs](screenshots/AWS_VPC_Peering_Evidence/05_EC2_Private_IPs/)
 - [06 — Cleanup evidence](screenshots/AWS_VPC_Peering_Evidence/06_Cleanup/)
 
-A copy of the currently uploaded PDF is also present inside the evidence directory; it is a report file, not a screenshot.
 
 ## AWS services and tools
 
