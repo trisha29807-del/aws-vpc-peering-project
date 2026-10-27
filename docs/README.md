@@ -1,3 +1,7 @@
-# Project documents
+# Project report
 
-Upload the final PDF report as `Trisha_EWB_VPC_Peering_Final.pdf` and the editable Word report as `Trisha_EWB_VPC_Peering_Updated.docx` in this folder.
+The finalized AWS VPC Peering project report is available here:
+
+- [Open the final PDF report](Trisha%20EWB%20VPC%20Peering%20Project%20(AWS%20Batch%201).pdf)
+
+The report is stored in this folder. Implementation and cleanup screenshots are organized under `screenshots/AWS_VPC_Peering_Evidence/`.
