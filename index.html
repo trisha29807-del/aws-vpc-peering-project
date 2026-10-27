@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AWS VPC Peering | Trisha</title>
+<meta name="description" content="AWS VPC Peering lab: private communication between two VPCs, route tables, security groups, bastion-host SSH, connectivity tests, and cleanup evidence.">
+<style>
+:root{color-scheme:dark;--bg:#10131b;--panel:#191e2a;--text:#f4f5f7;--muted:#b7bdcb;--accent:#9bb8ff;--line:#30384a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 10% 0%,#263452 0,transparent 38%),var(--bg);color:var(--text);font:16px/1.65 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:1000px;margin:auto;padding:56px 22px 72px}.eyebrow{color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:.78rem}
+h1{font-size:clamp(2.4rem,6vw,4.5rem);line-height:1.06;letter-spacing:-.04em;margin:.6rem 0 1rem}h2{font-size:1.35rem;margin:0 0 12px}p{color:var(--muted)}.lead{font-size:1.15rem;max-width:740px}
+.pills{display:flex;gap:9px;flex-wrap:wrap;margin:24px 0 38px}.pill{border:1px solid var(--line);border-radius:999px;padding:6px 12px;color:var(--muted);font-size:.88rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:24px 0}.card{background:rgba(25,30,42,.9);border:1px solid var(--line);border-radius:18px;padding:22px}.cidr{font:600 .95rem ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--accent)}ul{padding-left:20px;color:var(--muted)}li{margin:.35rem 0}.links{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}.btn{display:inline-block;text-decoration:none;color:#10131b;background:var(--accent);padding:11px 16px;border-radius:10px;font-weight:700}.btn.secondary{background:transparent;border:1px solid var(--line);color:var(--text)}a{color:var(--accent)}.note{border-left:3px solid var(--accent);padding:8px 0 8px 16px;margin:20px 0;color:var(--muted)}footer{border-top:1px solid var(--line);margin-top:44px;padding-top:18px;color:var(--muted);font-size:.9rem}
+</style>
+</head>
+<body><main>
+<div class="eyebrow">Cloud Networking · AWS Lab</div>
+<h1>AWS VPC<br>Peering Project</h1>
+<p class="lead">A hands-on implementation of private communication between two Amazon Virtual Private Clouds, using route tables, security groups, private EC2 instances, and bastion-host SSH access.</p>
+<div class="pills"><span class="pill">Amazon VPC</span><span class="pill">VPC Peering</span><span class="pill">EC2</span><span class="pill">SSH ProxyJump</span><span class="pill">ICMP Testing</span></div>
+<section>
+<h2>Network architecture</h2>
+<div class="grid">
+<div class="card"><h2>VPC A</h2><div class="cidr">10.10.0.0/16</div><ul><li>Public subnet: 10.10.1.0/24</li><li>Bastion: 10.10.1.10</li><li>Private subnet: 10.10.2.0/24</li><li>Application A: 10.10.2.10</li></ul></div>
+<div class="card"><h2>VPC Peering</h2><p>During testing, a peering connection provided a private route between the two non-overlapping VPC address ranges. Both route tables and security-group rules had to permit the traffic.</p><div class="cidr">Private IPv4 connectivity</div></div>
+<div class="card"><h2>VPC B</h2><div class="cidr">10.20.0.0/16</div><ul><li>Private subnet: 10.20.1.0/24</li><li>Application B: 10.20.1.10</li></ul></div>
+</div>
+</section>
+<section class="card">
+<h2>Validation results</h2>
+<ul><li>SSH access to both private instances through the bastion host succeeded.</li><li>App A → App B ping: 4/4 packets received, 0% loss.</li><li>App B → App A ping: 4/4 packets received, 0% loss.</li><li>A controlled ICMP security-group change blocked ping; restoring the rule restored connectivity.</li></ul>
+<p class="note">A pre-peering baseline failure was not captured; this limitation is documented in the report.</p>
+</section>
+<section style="margin-top:30px">
+<h2>Project deliverables</h2>
+<p>The report and evidence links will work after the corresponding files are uploaded to this repository.</p>
+<div class="links"><a class="btn" href="docs/Trisha_EWB_VPC_Peering_Final.pdf">Read the PDF report</a><a class="btn secondary" href="docs/Trisha_EWB_VPC_Peering_Updated.docx">Download editable report</a><a class="btn secondary" href="https://github.com/trisha29807-del/aws-vpc-peering-project">View GitHub repository</a></div>
+</section>
+<section style="margin-top:30px">
+<h2>Cleanup and security</h2>
+<p>The lab instances and lab network resources were removed after testing. The final VPC console evidence shows both lab VPCs absent while one other VPC remains. Credentials and private keys must never be committed to a public repository. Billing data can lag, so account billing should be checked separately.</p>
+</section>
+<footer>Created by Trisha · AWS Internship Batch 1 · Region used: Asia Pacific (Sydney), ap-southeast-2</footer>
+</main></body></html>
