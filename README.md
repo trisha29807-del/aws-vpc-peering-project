@@ -1,5 +1,7 @@
 # AWS VPC Peering Project
 
+🌐 **Live Project Website:** [View the project landing page](https://trisha29807-del.github.io/aws-vpc-peering-project/)
+
 > **Project:** Secure Communication Between Two Amazon VPCs Using VPC Peering  
 > **Author:** Trisha · AWS Internship Batch 1  
 > **AWS Region:** Asia Pacific (Sydney) — `ap-southeast-2`
@@ -39,7 +41,7 @@ The two VPCs use non-overlapping CIDR ranges. During the lab, VPC Peering and ro
 
 - **[Project report (PDF)](docs/Trisha%20EWB%20VPC%20Peering%20Project%20(AWS%20Batch%201).pdf)** — the PDF currently present in the repository.
 - **[Implementation and cleanup screenshots](screenshots/AWS_VPC_Peering_Evidence/)** — organized evidence folders.
-- **[Project landing page source](index.html)** — static HTML page; it requires GitHub Pages to be enabled before it is available as a hosted website.
+- **[Project landing page source](index.html)** — source code for the live GitHub Pages website.
 
 The editable DOCX and the separately named final PDF are **not currently in this repository**.
 
