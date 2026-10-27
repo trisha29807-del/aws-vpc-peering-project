@@ -1,62 +1,83 @@
 # AWS VPC Peering Project
 
-## Overview
-This project demonstrates private communication between two Amazon Virtual Private Clouds (VPCs) using AWS VPC Peering, EC2 instances, route tables, security groups, and a bastion host.
+> **Project:** Secure Communication Between Two Amazon VPCs Using VPC Peering  
+> **Author:** Trisha · AWS Internship Batch 1  
+> **Region:** Asia Pacific (Sydney) — `ap-southeast-2`
 
-## Objectives
-- Create two separate VPCs with non-overlapping CIDR ranges.
-- Configure public and private subnets.
-- Establish a VPC peering connection.
-- Configure routes for communication between the VPCs.
-- Use a bastion host to access private EC2 instances through SSH.
-- Verify connectivity using ICMP ping tests.
-- Test security group rules by blocking and restoring ICMP traffic.
+## Overview
+
+This project demonstrates private communication between two Amazon Virtual Private Clouds (VPCs) using VPC Peering, EC2 instances, route tables, security groups, and a bastion host. The implementation was tested with SSH and ICMP connectivity checks, including a controlled security-group change to observe failure and recovery.
 
 ## Architecture
 
-**VPC A — 10.10.0.0/16**
-- Public subnet: 10.10.1.0/24
-- Private subnet: 10.10.2.0/24
-- Bastion host in the public subnet
-- App-A EC2 instance in the private subnet
+**VPC A — `10.10.0.0/16`**
+- Public subnet: `10.10.1.0/24` — bastion host (`10.10.1.10`)
+- Private subnet: `10.10.2.0/24` — Application A (`10.10.2.10`)
 
-**VPC B — 10.20.0.0/16**
-- Private subnet: 10.20.1.0/24
-- App-B EC2 instance in the private subnet
+**VPC B — `10.20.0.0/16`**
+- Private subnet: `10.20.1.0/24` — Application B (`10.20.1.10`)
 
-The two VPCs are connected through a VPC peering connection. Route tables and security groups control the permitted traffic.
+The VPCs were connected by a peering connection during testing. Routes and security groups controlled permitted traffic. The AWS resources used for the lab were removed after testing; the final VPC screenshot shows both lab VPCs absent and one other VPC remaining.
 
-## Implementation
-1. Created both VPCs and their subnets.
-2. Configured an Internet Gateway for public access to the bastion host.
-3. Launched the bastion, App-A, and App-B EC2 instances.
-4. Established and activated the VPC peering connection.
-5. Added the required routes to the route tables.
-6. Configured security groups for SSH and ICMP traffic.
-7. Connected to private instances through the bastion host.
-8. Tested connectivity and verified the effect of changing security group rules.
+## Objectives
 
-## Testing and Results
-- SSH access to the private EC2 instances through the bastion host was verified.
-- Ping from App-A to App-B succeeded after routing and security rules were configured.
-- Reverse ping from App-B to App-A also succeeded.
-- A controlled ICMP security group change caused ping traffic to fail.
-- Restoring the ICMP rule restored connectivity.
+- Configure two VPCs with non-overlapping CIDR ranges.
+- Create public and private subnets and configure route tables.
+- Establish VPC peering and allow the required traffic.
+- Access private EC2 instances through a bastion host using SSH ProxyJump.
+- Verify connectivity in both directions using ICMP ping.
+- Demonstrate the effect of a security-group rule change.
+- Capture implementation and cleanup evidence.
 
-## Technologies Used
-- Amazon Web Services (AWS)
+## Implementation and test results
+
+- SSH access to both private EC2 instances through the bastion host succeeded.
+- App A `10.10.2.10` → App B `10.20.1.10`: 4 packets received, 0% loss.
+- App B `10.20.1.10` → App A `10.10.2.10`: 4 packets received, 0% loss.
+- Temporarily removing the relevant inbound ICMP permission caused the ping to fail (4 sent, 0 received); restoring the rule restored connectivity.
+- **Limitation:** a pre-peering baseline failure was not captured and is disclosed in the report.
+
+## Project documents
+
+Once uploaded, the files will be available here:
+
+- [Final project report (PDF)](docs/Trisha_EWB_VPC_Peering_Final.pdf)
+- [Editable project report (DOCX)](docs/Trisha_EWB_VPC_Peering_Updated.docx)
+- [Implementation and cleanup screenshots](screenshots/)
+
+## Evidence structure
+
+Screenshots should be organized as follows:
+
+- `screenshots/01_Ping_Tests/`
+- `screenshots/02_SSH_Access/`
+- `screenshots/03_VPC_Peering_and_Routes/`
+- `screenshots/04_Security_Groups/`
+- `screenshots/05_EC2_Private_IPs/`
+- `screenshots/06_Cleanup/`
+
+## AWS services and tools
+
 - Amazon VPC and VPC Peering
 - Amazon EC2
-- Route Tables and Internet Gateway
+- Route tables and Internet Gateway
 - Security Groups
-- SSH and ICMP
+- SSH / ProxyJump and ICMP
 - GitHub
 
-## Evidence
-Screenshots of the AWS configuration, routing, security group rules, SSH access, connectivity tests, and cleanup will be added to this repository.
+## Key learning outcomes
 
-## Learning Outcomes
-This project provided practical experience with VPC networking, private IP communication, routing, network security, bastion-host access, and connectivity troubleshooting.
+- How routes on both sides are required for private VPC-to-VPC connectivity.
+- How security groups affect reachability even when peering is active.
+- How to reach private instances through a bastion host.
+- How to validate connectivity, troubleshoot a controlled failure, and document cleanup.
 
-## Security Note
-Private keys, passwords, access tokens, and other credentials must never be uploaded to this repository.
+## Security and cleanup notes
+
+- Never commit private keys, passwords, access tokens, or other credentials.
+- Public repository screenshots should be checked for account identifiers and unrelated resources before uploading.
+- Lab cleanup was performed after evidence capture. AWS billing data can lag; check the Billing console separately if needed.
+
+## Author
+
+Trisha — [GitHub profile](https://github.com/trisha29807-del)
